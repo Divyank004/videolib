@@ -1,18 +1,30 @@
 import React, { Component } from "react";
 import { getMovies } from "./../services/fakeMovieService";
 import "./movies.css";
+import Like from "./common/like";
+
 class Movies extends Component {
   state = {
     movies: getMovies(),
   };
 
-  deleteMovie(movie) {
+  handleDelete(movie) {
     const movies = this.state.movies.filter((m) => m._id !== movie._id);
     this.setState({ movies });
   }
 
+  handleLike(movie) {
+    console.log("inside liked");
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    let likedMovie = movies[index];
+    likedMovie.liked = !likedMovie.liked;
+    movies[index] = { ...likedMovie };
+    this.setState({ movies });
+  }
+
   render() {
-    const noMovies = this.state.movies.length == 0 ? true : false;
+    const noMovies = this.state.movies.length === 0 ? true : false;
 
     if (noMovies) {
       return <p>No movies in the database</p>;
@@ -39,10 +51,16 @@ class Movies extends Component {
                 <td>{movie.numberInStock}</td>
                 <td>{movie.dailyRentalRate}</td>
                 <td>
+                  <Like
+                    liked={movie.liked}
+                    onClick={() => this.handleLike(movie)}
+                  />
+                </td>
+                <td>
                   <button
                     type="button"
                     class="btn btn-danger btn-sm"
-                    onClick={() => this.deleteMovie(movie)}
+                    onClick={() => this.handleDelete(movie)}
                   >
                     Delete
                   </button>
